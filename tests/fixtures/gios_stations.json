@@ -1,0 +1,225 @@
+{
+ "@context": {
+  "Lista stacji pomiarów": {
+   "@id": "https://api.gios.gov.pl/pjp-api/v1/rest/station/findAll"
+  },
+  "links": "https://schema.org/relatedLink",
+  "totalPages": "https://schema.org/numberOfPages"
+ },
+ "Lista stacji pomiarowych": [
+  {
+   "Identyfikator stacji": 295,
+   "Kod stacji": "LdLodzCzerni",
+   "Nazwa stacji": "Łódź, ul. Czernika",
+   "WGS84 φ N": "51.758050",
+   "WGS84 λ E": "19.529786",
+   "Identyfikator miasta": 516,
+   "Nazwa miasta": "Łódź",
+   "Gmina": "Łódź",
+   "Powiat": "Łódź",
+   "Województwo": "ŁÓDZKIE",
+   "Ulica": "ul. Czernika 1/3"
+  },
+  {
+   "Identyfikator stacji": 296,
+   "Kod stacji": "LdLodzGdansk",
+   "Nazwa stacji": "Łódź, ul. Gdańska",
+   "WGS84 φ N": "51.775378",
+   "WGS84 λ E": "19.450992",
+   "Identyfikator miasta": 516,
+   "Nazwa miasta": "Łódź",
+   "Gmina": "Łódź",
+   "Powiat": "Łódź",
+   "Województwo": "ŁÓDZKIE",
+   "Ulica": "ul. Gdańska 16"
+  },
+  {
+   "Identyfikator stacji": 302,
+   "Kod stacji": "LdLodzLegion",
+   "Nazwa stacji": "Łódź, ul. Legionów",
+   "WGS84 φ N": "51.776417",
+   "WGS84 λ E": "19.452936",
+   "Identyfikator miasta": 516,
+   "Nazwa miasta": "Łódź",
+   "Gmina": "Łódź",
+   "Powiat": "Łódź",
+   "Województwo": "ŁÓDZKIE",
+   "Ulica": "ul. Legionów 1"
+  },
+  {
+   "Identyfikator stacji": 530,
+   "Kod stacji": "MzWarAlNiepo",
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "WGS84 φ N": "52.219298",
+   "WGS84 λ E": "21.004724",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "Al. Niepodległości 227/233"
+  },
+  {
+   "Identyfikator stacji": 532,
+   "Kod stacji": "MzWarAKrzywo",
+   "Nazwa stacji": "Warszawa, ul. Krzywoń",
+   "WGS84 φ N": "52.228649",
+   "WGS84 λ E": "20.917513",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Anieli Krzywoń"
+  },
+  {
+   "Identyfikator stacji": 538,
+   "Kod stacji": "MzWarTolstoj",
+   "Nazwa stacji": "Warszawa, ul. Tołstoja",
+   "WGS84 φ N": "52.285073",
+   "WGS84 λ E": "20.933018",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Tołstoja 2"
+  },
+  {
+   "Identyfikator stacji": 550,
+   "Kod stacji": "MzWarWokalna",
+   "Nazwa stacji": "Warszawa, ul. Wokalna",
+   "WGS84 φ N": "52.160772",
+   "WGS84 λ E": "21.033819",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Wokalna 1"
+  },
+  {
+   "Identyfikator stacji": 552,
+   "Kod stacji": "MzWarKondrat",
+   "Nazwa stacji": "Warszawa, ul. Kondratowicza",
+   "WGS84 φ N": "52.290864",
+   "WGS84 λ E": "21.042458",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Kondratowicza 8"
+  },
+  {
+   "Identyfikator stacji": 10058,
+   "Kod stacji": "LdLodzJanPaw",
+   "Nazwa stacji": "Łódź, Al. Jana Pawła II",
+   "WGS84 φ N": "51.754613",
+   "WGS84 λ E": "19.434925",
+   "Identyfikator miasta": 516,
+   "Nazwa miasta": "Łódź",
+   "Gmina": "Łódź",
+   "Powiat": "Łódź",
+   "Województwo": "ŁÓDZKIE",
+   "Ulica": "Al. Jana Pawła II 15"
+  },
+  {
+   "Identyfikator stacji": 10955,
+   "Kod stacji": "MzWarChrosci",
+   "Nazwa stacji": "Warszawa, ul. Chrościckiego",
+   "WGS84 φ N": "52.207742",
+   "WGS84 λ E": "20.906073",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Chrościckiego 16/18"
+  },
+  {
+   "Identyfikator stacji": 10956,
+   "Kod stacji": "MzWarBajkowa",
+   "Nazwa stacji": "Warszawa, ul. Bajkowa",
+   "WGS84 φ N": "52.188474",
+   "WGS84 λ E": "21.176233",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Bajkowa 17/21"
+  },
+  {
+   "Identyfikator stacji": 16533,
+   "Kod stacji": "MzWarMeteo",
+   "Nazwa stacji": "Warszawa, IMGW",
+   "WGS84 φ N": "52.281304",
+   "WGS84 λ E": "20.963383",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Podleśna 61"
+  },
+  {
+   "Identyfikator stacji": 20487,
+   "Kod stacji": "MzWarGrochow",
+   "Nazwa stacji": "Warszawa, ul. Grochowska",
+   "WGS84 φ N": "52.245704",
+   "WGS84 λ E": "21.080427",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "ul. Grochowska 244A"
+  },
+  {
+   "Identyfikator stacji": 20488,
+   "Kod stacji": "MzWarSolidar",
+   "Nazwa stacji": "Warszawa, Al. Solidarności",
+   "WGS84 φ N": "52.243573",
+   "WGS84 λ E": "20.999214",
+   "Identyfikator miasta": 1006,
+   "Nazwa miasta": "Warszawa",
+   "Gmina": "Warszawa",
+   "Powiat": "Warszawa",
+   "Województwo": "MAZOWIECKIE",
+   "Ulica": "Al. Solidarności 83/89"
+  }
+ ],
+ "meta": {
+  "dc:description": "Usługa sieciowa udostępniająca listę funkcjonujących stacji pomiarowych",
+  "sy:updateFrequency": "1",
+  "dc:language": "pol (ISO 639-2 / ISO 639-3)",
+  "schema:contentType": "application/ld+json",
+  "schema:provider": {
+   "@context": "https://schema.org",
+   "@type": "Organization",
+   "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Warszawa",
+    "postalCode": "02-362",
+    "streetAddress": "Bitwy Warszawskiej 1920 3"
+   },
+   "email": "api@gios.gov.pl",
+   "name": "Główny Inspektorat Ochrony Środowiska"
+  },
+  "schema:dateModified": "do uzupełnienia po publikacji (ISO 8601)",
+  "dc:title": "Lista stacji pomiarowych",
+  "schema:datePublished": "10.04.2017",
+  "schema:keywords": "powietrze, jakość powietrza, zanieczyszczenie powietrza, stacje pomiarowe, stanowiska pomiarowe, monitoring powietrza, Państwowy Monitoring Środowiska, środowisko, stan środowiska",
+  "sy:updatePeriod": "year",
+  "schema:isPartOf": "Państwowy Monitoring Środowiska, Jakość powietrza"
+ },
+ "links": {
+  "next": "https://api.gios.gov.pl/pjp-api/v1/rest/station/findAll?page=1&size=500",
+  "last": "https://api.gios.gov.pl/pjp-api/v1/rest/station/findAll?page=0&size=500",
+  "prev": "https://api.gios.gov.pl/pjp-api/v1/rest/station/findAll?page=0&size=500",
+  "self": "https://api.gios.gov.pl/pjp-api/v1/rest/station/findAll?page=0&size=500",
+  "first": "https://api.gios.gov.pl/pjp-api/v1/rest/station/findAll?page=0&size=500"
+ },
+ "totalPages": 1
+}

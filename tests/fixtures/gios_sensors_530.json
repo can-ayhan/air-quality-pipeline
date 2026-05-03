@@ -1,0 +1,99 @@
+{
+ "@context": {
+  "Lista stanowisk pomiarowych dla podanej stacji": {
+   "@id": "https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors"
+  },
+  "links": "https://schema.org/relatedLink",
+  "totalPages": "https://schema.org/numberOfPages"
+ },
+ "Lista stanowisk pomiarowych dla podanej stacji": [
+  {
+   "Identyfikator stanowiska": 3575,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "benzen",
+   "Wskaźnik - wzór": "C6H6",
+   "Wskaźnik - kod": "C6H6",
+   "Id wskaźnika": 10
+  },
+  {
+   "Identyfikator stanowiska": 3576,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "tlenek węgla",
+   "Wskaźnik - wzór": "CO",
+   "Wskaźnik - kod": "CO",
+   "Id wskaźnika": 8
+  },
+  {
+   "Identyfikator stanowiska": 3579,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "tlenek azotu",
+   "Wskaźnik - wzór": "NO",
+   "Wskaźnik - kod": "NO",
+   "Id wskaźnika": 16
+  },
+  {
+   "Identyfikator stanowiska": 3580,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "dwutlenek azotu",
+   "Wskaźnik - wzór": "NO2",
+   "Wskaźnik - kod": "NO2",
+   "Id wskaźnika": 6
+  },
+  {
+   "Identyfikator stanowiska": 3581,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "tlenki azotu",
+   "Wskaźnik - wzór": "NOx",
+   "Wskaźnik - kod": "NOx",
+   "Id wskaźnika": 7
+  },
+  {
+   "Identyfikator stanowiska": 3584,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "pył zawieszony PM10",
+   "Wskaźnik - wzór": "PM10",
+   "Wskaźnik - kod": "PM10",
+   "Id wskaźnika": 3
+  },
+  {
+   "Identyfikator stanowiska": 3585,
+   "Identyfikator stacji": 530,
+   "Wskaźnik": "pył zawieszony PM2.5",
+   "Wskaźnik - wzór": "PM2.5",
+   "Wskaźnik - kod": "PM2.5",
+   "Id wskaźnika": 69
+  }
+ ],
+ "meta": {
+  "dc:description": "Usługa sieciowa udostępniająca listę funkcjonujących stanowisk pomiarowych",
+  "sy:updateFrequency": "1",
+  "dc:language": "pol (ISO 639-2 / ISO 639-3)",
+  "schema:contentType": "application/ld+json",
+  "schema:provider": {
+   "@context": "https://schema.org",
+   "@type": "Organization",
+   "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Warszawa",
+    "postalCode": "02-362",
+    "streetAddress": "Bitwy Warszawskiej 1920 3"
+   },
+   "email": "api@gios.gov.pl",
+   "name": "Główny Inspektorat Ochrony Środowiska"
+  },
+  "schema:dateModified": "03.11.2022",
+  "dc:title": "Lista stanowisk pomiarowych na stacji",
+  "schema:datePublished": "10.04.2017",
+  "schema:keywords": "powietrze, jakość powietrza, zanieczyszczenie powietrza, stacje pomiarowe, stanowiska pomiarowe, monitoring powietrza, Państwowy Monitoring Środowiska, środowisko, stan środowiska",
+  "sy:updatePeriod": "year",
+  "schema:isPartOf": "Państwowy Monitoring Środowiska, Jakość powietrza"
+ },
+ "links": {
+  "next": "https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors/530?page=1&size=500",
+  "last": "https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors/530?page=0&size=500",
+  "prev": "https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors/530?page=0&size=500",
+  "self": "https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors/530?page=0&size=500",
+  "first": "https://api.gios.gov.pl/pjp-api/v1/rest/station/sensors/530?page=0&size=500"
+ },
+ "totalPages": 1
+}
