@@ -2,14 +2,20 @@
 
 API: https://api.gios.gov.pl/pjp-api/v1/rest (JSON-LD, Polish field names, paged).
 
-Two calls so far:
+Three calls are used:
 
-* station/findAll                 every measuring station
-* station/sensors/{station}       the sensors ("stanowiska") of a station, one per pollutant
+* station/findAll                            every measuring station
+* station/sensors/{station}                  the sensors ("stanowiska") of a station, one per pollutant
+* archivalData/getDataBySensor/{sensor}      measurements of a sensor for a date range
+
+Hourly results from the archival endpoint are in CET (UTC+1) all year, without
+daylight saving. The client returns them as naive datetimes in that clock and
+leaves the conversion to UTC to the warehouse, where it is visible and tested.
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import logging
 import time
 from dataclasses import dataclass
@@ -24,6 +30,7 @@ PAGE_SIZE = 500
 # keys of the lists in the responses
 STATIONS = "Lista stacji pomiarowych"
 SENSORS = "Lista stanowisk pomiarowych dla podanej stacji"
+MEASUREMENTS = "Lista archiwalnych wyników pomiarów"
 
 
 class GiosError(RuntimeError):
@@ -50,6 +57,18 @@ class Sensor:
     pollutant_name: str      # Polish name as published
 
 
+@dataclass(frozen=True)
+class Measurement:
+    sensor_id: int
+    sensor_code: str         # e.g. MzWarAlNiepo-PM10-1g; the suffix is the averaging time
+    measured_at_cet: dt.datetime
+    value: float | None      # None: the hour exists but has no valid result
+
+    @property
+    def is_hourly(self) -> bool:
+        return self.sensor_code.endswith("-1g")
+
+
 def parse_station(item: dict) -> Station:
     return Station(
         station_id=int(item["Identyfikator stacji"]),
@@ -69,6 +88,16 @@ def parse_sensor(item: dict) -> Sensor:
         station_id=int(item["Identyfikator stacji"]),
         pollutant_code=item["Wskaźnik - kod"],
         pollutant_name=item["Wskaźnik"],
+    )
+
+
+def parse_measurement(sensor_id: int, item: dict) -> Measurement:
+    value = item.get("Wartość")
+    return Measurement(
+        sensor_id=sensor_id,
+        sensor_code=item["Kod stanowiska"],
+        measured_at_cet=dt.datetime.strptime(item["Data"], "%Y-%m-%d %H:%M:%S"),
+        value=None if value is None else float(value),
     )
 
 
@@ -117,3 +146,9 @@ class GiosClient:
 
     def sensors(self, station_id: int) -> list[Sensor]:
         return [parse_sensor(item) for item in self._all_pages(f"station/sensors/{station_id}", SENSORS)]
+
+    def measurements(self, sensor_id: int, first_day: dt.date, last_day: dt.date) -> list[Measurement]:
+        """All results of a sensor from 00:00 on first_day to 23:00 on last_day (CET)."""
+        params = {"dateFrom": f"{first_day:%Y-%m-%d} 00:00", "dateTo": f"{last_day:%Y-%m-%d} 23:00"}
+        items = self._all_pages(f"archivalData/getDataBySensor/{sensor_id}", MEASUREMENTS, params)
+        return [parse_measurement(sensor_id, item) for item in items]

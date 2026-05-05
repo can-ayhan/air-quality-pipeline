@@ -28,10 +28,10 @@ class FakeResponse:
 
 
 class FixtureSession:
-    """Serves the station list and the sensors of station 530.
+    """Serves the station list, the sensors of station 530, and one day of two sensors.
 
-    Any other station gets an empty, well-formed answer, the way the API answers
-    for a station without sensors.
+    Anything else that is asked for gets an empty, well-formed answer, the way the
+    API answers for a station without sensors or a sensor without results.
     """
 
     def __init__(self) -> None:
@@ -45,6 +45,10 @@ class FixtureSession:
         if match := re.search(r"/station/sensors/(\d+)$", url):
             return self._file_or_empty(f"gios_sensors_{match.group(1)}.json",
                                        "Lista stanowisk pomiarowych dla podanej stacji")
+        if match := re.search(r"/archivalData/getDataBySensor/(\d+)$", url):
+            day = params.get("dateFrom", "")[:10]
+            return self._file_or_empty(f"gios_measurements_{match.group(1)}_{day}.json",
+                                       "Lista archiwalnych wyników pomiarów")
         return FakeResponse({"error": "not found"}, status_code=404)
 
     @staticmethod

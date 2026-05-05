@@ -1,0 +1,184 @@
+{
+ "@context": {
+  "Lista archiwalnych wyników pomiarów": {
+   "@id": "https://api.gios.gov.pl/pjp-api/v1/rest/archivalData/getDataBySensor"
+  },
+  "links": "http://schema.org/relatedLink",
+  "totalPages": "https://schema.org/numberOfPages"
+ },
+ "Lista archiwalnych wyników pomiarów": [
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 00:00:00",
+   "Wartość": 7.0
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 01:00:00",
+   "Wartość": 6.9
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 02:00:00",
+   "Wartość": 5.0
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 03:00:00",
+   "Wartość": 4.8
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 04:00:00",
+   "Wartość": 5.1
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 05:00:00",
+   "Wartość": 9.8
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 06:00:00",
+   "Wartość": 16.8
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 07:00:00",
+   "Wartość": 15.8
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 08:00:00",
+   "Wartość": 18.1
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 09:00:00",
+   "Wartość": 13.9
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 10:00:00",
+   "Wartość": 11.2
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 11:00:00",
+   "Wartość": 11.7
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 12:00:00",
+   "Wartość": 10.9
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 13:00:00",
+   "Wartość": 12.3
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 14:00:00",
+   "Wartość": 9.0
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 15:00:00",
+   "Wartość": 12.2
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 16:00:00",
+   "Wartość": 12.6
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 17:00:00",
+   "Wartość": 14.6
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 18:00:00",
+   "Wartość": 16.1
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 19:00:00",
+   "Wartość": 18.2
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 20:00:00",
+   "Wartość": 21.8
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 21:00:00",
+   "Wartość": 27.3
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 22:00:00",
+   "Wartość": 25.8
+  },
+  {
+   "Nazwa stacji": "Warszawa, Al. Niepodległości",
+   "Kod stanowiska": "MzWarAlNiepo-NO2-1g",
+   "Data": "2026-04-20 23:00:00",
+   "Wartość": 28.1
+  }
+ ],
+ "meta": {
+  "dc:description": "Usługa sieciowa udostępniająca bieżące lub archiwalne wyniki pomiarów ze stanowisk automatycznych i manualnych na podstawie podanego identyfikatora stanowiska pomiarowego dla dowolnego wybranego okresu czasu nie dłuższego niż 366 dni. Wyniki pomiarów  jednogodzinnych udostępniane są w czasie CET (UTC+1)",
+  "dc:language": "pol (ISO 639-2 / ISO 639-3)",
+  "schema:contentType": "application/ld+json",
+  "schema:provider": {
+   "@context": "https://schema.org",
+   "@type": "Organization",
+   "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Warszawa",
+    "postalCode": "02-362",
+    "streetAddress": "Bitwy Warszawskiej 1920 3"
+   },
+   "email": "api@gios.gov.pl",
+   "name": "Główny Inspektorat Ochrony Środowiska"
+  },
+  "dc:title": "Dane pomiarowe z wybranego stanowiska (max 1 rok)",
+  "schema:datePublished": "03.11.2022",
+  "schema:keywords": "dane pomiarowe, wyniki pomiarów, powietrze, jakość powietrza, zanieczyszczenie powietrza, stacje pomiarowe, stanowiska pomiarowe, monitoring powietrza, Państwowy Monitoring Środowiska, środowisko, stan środowiska",
+  "schema:isPartOf": "Państwowy Monitoring Środowiska, Jakość powietrza"
+ },
+ "links": {
+  "next": "https://api.gios.gov.pl/pjp-api/v1/rest/archivalData/getDataBySensor/3580?dateFrom=2026-04-20+00%3A00&dateTo=2026-04-20+23%3A00&page=1&size=500",
+  "last": "https://api.gios.gov.pl/pjp-api/v1/rest/archivalData/getDataBySensor/3580?dateFrom=2026-04-20+00%3A00&dateTo=2026-04-20+23%3A00&page=0&size=500",
+  "prev": "https://api.gios.gov.pl/pjp-api/v1/rest/archivalData/getDataBySensor/3580?dateFrom=2026-04-20+00%3A00&dateTo=2026-04-20+23%3A00&page=0&size=500",
+  "self": "https://api.gios.gov.pl/pjp-api/v1/rest/archivalData/getDataBySensor/3580?dateFrom=2026-04-20+00%3A00&dateTo=2026-04-20+23%3A00&page=0&size=500",
+  "first": "https://api.gios.gov.pl/pjp-api/v1/rest/archivalData/getDataBySensor/3580?dateFrom=2026-04-20+00%3A00&dateTo=2026-04-20+23%3A00&page=0&size=500"
+ },
+ "totalPages": 1
+}

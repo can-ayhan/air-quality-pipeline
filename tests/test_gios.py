@@ -1,3 +1,5 @@
+import datetime as dt
+
 import pytest
 import requests
 
@@ -30,14 +32,38 @@ def test_sensors_of_a_station():
     assert (pm10.sensor_id, pm10.station_id) == (3584, 530)
 
 
+def test_measurements_keep_the_published_clock():
+    session = FixtureSession()
+    results = GiosClient(session=session).measurements(3584, dt.date(2026, 4, 20), dt.date(2026, 4, 20))
+    assert len(results) == 24
+    assert results[0].measured_at_cet == dt.datetime(2026, 4, 20, 0, 0)
+    assert results[-1].measured_at_cet == dt.datetime(2026, 4, 20, 23, 0)
+    assert results[0].value == 15.0
+    assert all(r.sensor_code == "MzWarAlNiepo-PM10-1g" and r.is_hourly for r in results)
+    url, params = session.calls[0]
+    assert url.endswith("/archivalData/getDataBySensor/3584")
+    assert (params["dateFrom"], params["dateTo"]) == ("2026-04-20 00:00", "2026-04-20 23:00")
+
+
+def test_a_missing_value_stays_missing():
+    item = {"Kod stanowiska": "MzWarAlNiepo-PM10-1g", "Data": "2026-04-20 05:00:00", "Wartość": None}
+    assert gios.parse_measurement(3584, item).value is None
+
+
+def test_daily_manual_results_are_not_hourly():
+    item = {"Kod stanowiska": "MzWarAlNiepo-PM10-24g", "Data": "2026-04-20 00:00:00", "Wartość": 21.3}
+    assert not gios.parse_measurement(1, item).is_hourly
+
+
 def test_all_pages_are_read():
-    stations = load("gios_stations.json")[gios.STATIONS]
+    rows = load("gios_measurements_3584_2026-04-20.json")[gios.MEASUREMENTS]
     session = ScriptedSession([
-        FakeResponse({gios.STATIONS: stations[:6], "totalPages": 3}),
-        FakeResponse({gios.STATIONS: stations[6:12], "totalPages": 3}),
-        FakeResponse({gios.STATIONS: stations[12:], "totalPages": 3}),
+        FakeResponse({gios.MEASUREMENTS: rows[:10], "totalPages": 3}),
+        FakeResponse({gios.MEASUREMENTS: rows[10:20], "totalPages": 3}),
+        FakeResponse({gios.MEASUREMENTS: rows[20:], "totalPages": 3}),
     ])
-    assert len(GiosClient(session=session).stations()) == 14
+    results = GiosClient(session=session).measurements(3584, dt.date(2026, 4, 20), dt.date(2026, 4, 20))
+    assert len(results) == 24
     assert [params["page"] for _, params in session.calls] == [0, 1, 2]
 
 
