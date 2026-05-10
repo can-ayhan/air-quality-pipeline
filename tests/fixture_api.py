@@ -28,7 +28,7 @@ class FakeResponse:
 
 
 class FixtureSession:
-    """Serves the station list, the sensors of station 530, and one day of two sensors.
+    """Serves the station list, the sensors of station 530, one day of two sensors and one day of weather.
 
     Anything else that is asked for gets an empty, well-formed answer, the way the
     API answers for a station without sensors or a sensor without results.
@@ -40,6 +40,8 @@ class FixtureSession:
     def get(self, url: str, params: dict | None = None, timeout: float | None = None) -> FakeResponse:
         params = dict(params or {})
         self.calls.append((url, params))
+        if "open-meteo.com" in url:
+            return FakeResponse(load("openmeteo_warszawa_2026-04-20.json"))
         if url.endswith("/station/findAll"):
             return FakeResponse(load("gios_stations.json"))
         if match := re.search(r"/station/sensors/(\d+)$", url):
