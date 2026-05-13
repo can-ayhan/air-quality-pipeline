@@ -13,6 +13,18 @@ Daily pipeline that loads hourly air-quality readings and weather for Polish cit
 4. Airflow to run it every day and to backfill
 5. CI
 
+## Running a load
+
+```
+python -m venv .venv && .venv/bin/pip install -e ".[dev]"
+docker compose up -d                                      # PostgreSQL on localhost:5435
+python -m airquality ingest --from 2026-04-20 --to 2026-04-21
+```
+
+`ingest` creates the raw tables if they are missing, then loads the stations and sensors
+of the configured cities (`config/cities.yml`), their hourly results and the hourly weather
+for the given days. Loading the same days again updates the rows in place.
+
 ## Status
 
-Work in progress.
+Work in progress: steps 1 and 2 are done.
