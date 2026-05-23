@@ -4,7 +4,7 @@ import pytest
 
 from airquality import gios, ingest
 from airquality.config import City, Coverage
-from airquality.gios import GiosClient
+from airquality.gios import GiosClient, Measurement
 from fixture_api import FixtureSession
 
 DAY = dt.date(2026, 4, 20)
@@ -45,6 +45,22 @@ def test_a_corrected_value_replaces_the_old_one(conn):
     ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
     lowest = conn.execute("select min(value) from raw.gios_measurement where sensor_id = 3584").fetchone()[0]
     assert lowest > 0
+
+
+def test_daily_manual_samples_are_left_out(conn, monkeypatch):
+    def with_a_daily_sample(self, sensor_id, first_day, last_day):
+        stamp = dt.datetime(2026, 4, 20)
+        return [
+            Measurement(sensor_id, "MzWarAlNiepo-PM10-1g", stamp, 15.0),
+            Measurement(sensor_id, "MzWarAlNiepo-PM10-24g", stamp, 21.3),
+        ]
+
+    monkeypatch.setattr(GiosClient, "measurements", with_a_daily_sample)
+    counts = ingest.ingest_air_quality(conn, GiosClient(session=FixtureSession()), WARSAW, DAY, DAY)
+    assert counts["measurements"] == 5
+    assert conn.execute("select distinct sensor_code from raw.gios_measurement").fetchall() == [
+        ("MzWarAlNiepo-PM10-1g",)
+    ]
 
 
 def test_weather_is_loaded_per_city_and_is_repeatable(conn):

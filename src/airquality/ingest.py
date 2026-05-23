@@ -35,7 +35,9 @@ def ingest_air_quality(conn: psycopg.Connection, client: GiosClient, coverage: C
     conn.commit()
     for done, sensor in enumerate(sensors, start=1):
         results = client.measurements(sensor.sensor_id, first_day, last_day)
-        counts["measurements"] += warehouse.upsert_measurements(conn, results)
+        # PM and benzene are also sampled by hand on filters: one value a day, code ending in -24g
+        hourly = [m for m in results if m.is_hourly]
+        counts["measurements"] += warehouse.upsert_measurements(conn, hourly)
         conn.commit()          # per sensor: an interrupted load keeps what it already has
         if done % 25 == 0:
             log.info("GIOS: %s of %s sensors, %s results so far", done, len(sensors), counts["measurements"])
