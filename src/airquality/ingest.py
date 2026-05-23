@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+from concurrent.futures import ThreadPoolExecutor
+from functools import partial
 
 import psycopg
 import requests
@@ -15,32 +17,39 @@ from airquality.openmeteo import hourly_weather
 
 log = logging.getLogger(__name__)
 
+# The archive endpoint can take 10-20 s for a sensor it has not served recently.
+# A few requests at a time keep a daily load to minutes without leaning on a free API.
+FETCH_WORKERS = 4
+
 
 def ingest_air_quality(conn: psycopg.Connection, client: GiosClient, coverage: Coverage,
-                       first_day: dt.date, last_day: dt.date) -> dict[str, int]:
+                       first_day: dt.date, last_day: dt.date, workers: int = FETCH_WORKERS) -> dict[str, int]:
     """Stations and sensors of the covered cities, then their hourly results for the days."""
     cities = {city.name for city in coverage.cities}
     stations = [s for s in client.stations() if s.city in cities]
-    sensors = [
-        sensor
-        for station in stations
-        for sensor in client.sensors(station.station_id)
-        if sensor.pollutant_code in coverage.pollutants
-    ]
-    counts = {
-        "stations": warehouse.upsert_stations(conn, stations),
-        "sensors": warehouse.upsert_sensors(conn, sensors),
-        "measurements": 0,
-    }
-    conn.commit()
-    for done, sensor in enumerate(sensors, start=1):
-        results = client.measurements(sensor.sensor_id, first_day, last_day)
-        # PM and benzene are also sampled by hand on filters: one value a day, code ending in -24g
-        hourly = [m for m in results if m.is_hourly]
-        counts["measurements"] += warehouse.upsert_measurements(conn, hourly)
-        conn.commit()          # per sensor: an interrupted load keeps what it already has
-        if done % 25 == 0:
-            log.info("GIOS: %s of %s sensors, %s results so far", done, len(sensors), counts["measurements"])
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        sensors = [
+            sensor
+            for found in pool.map(client.sensors, [s.station_id for s in stations])
+            for sensor in found
+            if sensor.pollutant_code in coverage.pollutants
+        ]
+        counts = {
+            "stations": warehouse.upsert_stations(conn, stations),
+            "sensors": warehouse.upsert_sensors(conn, sensors),
+            "measurements": 0,
+        }
+        conn.commit()
+        # the requests run in the pool; the rows are written here, in order, on the one connection
+        fetch = partial(client.measurements, first_day=first_day, last_day=last_day)
+        for done, results in enumerate(pool.map(fetch, [s.sensor_id for s in sensors]), start=1):
+            # PM and benzene are also sampled by hand on filters: one value a day, code ending in -24g
+            hourly = [m for m in results if m.is_hourly]
+            counts["measurements"] += warehouse.upsert_measurements(conn, hourly)
+            conn.commit()          # per sensor: an interrupted load keeps what it already has
+            if done % 25 == 0:
+                log.info("GIOS: %s of %s sensors, %s results so far",
+                         done, len(sensors), counts["measurements"])
     log.info("GIOS %s to %s: %s", first_day, last_day, counts)
     return counts
 

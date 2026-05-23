@@ -28,7 +28,8 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     with warehouse.connect() as conn:
         warehouse.ensure_raw_schema(conn)
         if args.source in ("air", "all"):
-            print(ingest.ingest_air_quality(conn, GiosClient(), coverage, first_day, last_day))
+            print(ingest.ingest_air_quality(conn, GiosClient(), coverage, first_day, last_day,
+                                            workers=args.workers))
         if args.source in ("weather", "all"):
             print({"weather_hours": ingest.ingest_weather(conn, coverage, first_day, last_day)})
     return 0
@@ -46,6 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--from", dest="first_day", required=True, **day)
     p.add_argument("--to", dest="last_day", help="default: the same day", **day)
     p.add_argument("--source", choices=["air", "weather", "all"], default="all")
+    p.add_argument("--workers", type=int, default=ingest.FETCH_WORKERS, help="parallel requests to GIOS")
     p.set_defaults(func=cmd_ingest)
 
     return parser
