@@ -63,6 +63,13 @@ def test_daily_manual_samples_are_left_out(conn, monkeypatch):
     ]
 
 
+def test_weather_is_asked_from_the_day_before(conn):
+    session = FixtureSession()
+    ingest.ingest_weather(conn, WARSAW, DAY, DAY, session=session, today=dt.date(2026, 4, 21))
+    _, params = session.calls[0]
+    assert (params["start_date"], params["end_date"]) == ("2026-04-19", "2026-04-20")
+
+
 def test_weather_is_loaded_per_city_and_is_repeatable(conn):
     for _ in range(2):
         rows = ingest.ingest_weather(conn, WARSAW, DAY, DAY, session=FixtureSession(),

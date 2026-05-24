@@ -56,11 +56,14 @@ def ingest_air_quality(conn: psycopg.Connection, client: GiosClient, coverage: C
 
 def ingest_weather(conn: psycopg.Connection, coverage: Coverage, first_day: dt.date, last_day: dt.date,
                    session: requests.Session | None = None, today: dt.date | None = None) -> int:
+    # The air-quality day is a CET day, which starts at 23:00 UTC the day before.
+    # Asking from one day earlier gives every measured hour its weather.
+    start = first_day - dt.timedelta(days=1)
     rows = 0
     for city in coverage.cities:
-        hours = hourly_weather(city.latitude, city.longitude, first_day, last_day,
+        hours = hourly_weather(city.latitude, city.longitude, start, last_day,
                                session=session, today=today)
         rows += warehouse.upsert_weather(conn, city.name, hours)
     conn.commit()
-    log.info("Open-Meteo %s to %s: %s rows", first_day, last_day, rows)
+    log.info("Open-Meteo %s to %s: %s rows", start, last_day, rows)
     return rows
