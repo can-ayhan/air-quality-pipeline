@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.6"]
+dbt = ["dbt-core==1.11.8", "dbt-postgres==1.10.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

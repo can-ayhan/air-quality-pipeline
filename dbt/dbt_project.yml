@@ -1,0 +1,16 @@
+name: air_quality
+version: "1.0.0"
+profile: air_quality
+
+model-paths: [models]
+seed-paths: [seeds]
+test-paths: [tests]
+macro-paths: [macros]
+target-path: target
+clean-targets: [target, dbt_packages]
+
+models:
+  air_quality:
+    staging:
+      +materialized: view
+      +schema: staging

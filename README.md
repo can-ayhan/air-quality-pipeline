@@ -25,6 +25,15 @@ python -m airquality ingest --from 2026-04-20 --to 2026-04-21
 of the configured cities (`config/cities.yml`), their hourly results and the hourly weather
 for the given days. Loading the same days again updates the rows in place.
 
+## Models
+
+```
+pip install -e ".[dbt]"
+dbt build --project-dir dbt --profiles-dir dbt
+```
+
+So far the dbt project declares the raw tables as sources and builds one staging view on each.
+
 ## Status
 
-Work in progress: steps 1 and 2 are done.
+Work in progress: steps 1 and 2 are done, 3 has started.

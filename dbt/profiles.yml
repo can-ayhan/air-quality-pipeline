@@ -1,0 +1,13 @@
+# Connection to the warehouse. Same variables and defaults as the ingest command.
+air_quality:
+  target: warehouse
+  outputs:
+    warehouse:
+      type: postgres
+      host: "{{ env_var('WAREHOUSE_HOST', 'localhost') }}"
+      port: "{{ env_var('WAREHOUSE_PORT', '5435') | as_number }}"
+      dbname: "{{ env_var('WAREHOUSE_DB', 'warehouse') }}"
+      user: "{{ env_var('WAREHOUSE_USER', 'airquality') }}"
+      password: "{{ env_var('WAREHOUSE_PASSWORD', 'airquality') }}"
+      schema: analytics
+      threads: 4
