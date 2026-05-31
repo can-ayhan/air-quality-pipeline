@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: stg_gios__stations
+    description: One row per measuring station.
+    columns:
+      - name: station_id
+        data_tests: [not_null, unique]
+      - name: station_code
+        data_tests: [not_null, unique]
+      - name: city
+        data_tests: [not_null]
+      - name: latitude
+        description: WGS84. The bounds are those of Poland; anything outside is a parsing mistake.
+        data_tests:
+          - not_null
+          - within_range:
+              arguments: {min_value: 49.0, max_value: 54.9}
+      - name: longitude
+        data_tests:
+          - not_null
+          - within_range:
+              arguments: {min_value: 14.1, max_value: 24.2}
+
+  - name: stg_gios__sensors
+    description: One row per sensor, that is per station and pollutant measured there.
+    columns:
+      - name: sensor_id
+        data_tests: [not_null, unique]
+      - name: station_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_gios__stations')", field: station_id}
+      - name: pollutant_code
+        data_tests: [not_null]
+
+  - name: stg_gios__measurements
+    description: One row per sensor and hour, with the published CET timestamp and its UTC equivalent.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [sensor_id, measured_at_utc]}
+    columns:
+      - name: sensor_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_gios__sensors')", field: sensor_id}
+      - name: measured_at_utc
+        data_tests: [not_null, not_in_future]
+      - name: value
+        description: µg/m3, except CO in mg/m3. NULL when the hour was reported without a valid result.
+
+  - name: stg_openmeteo__weather
+    description: One row per city and hour (UTC).
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [city, time_utc]}
+    columns:
+      - name: city
+        data_tests: [not_null]
+      - name: time_utc
+        data_tests: [not_null]
+      - name: temperature_c
+        data_tests:
+          - within_range:
+              arguments: {min_value: -45, max_value: 45}
+      - name: relative_humidity_pct
+        data_tests:
+          - within_range:
+              arguments: {min_value: 0, max_value: 100}
+      - name: wind_speed_ms
+        data_tests:
+          - within_range:
+              arguments: {min_value: 0, max_value: 60}
+      - name: wind_direction_deg
+        data_tests:
+          - within_range:
+              arguments: {min_value: 0, max_value: 360}
+      - name: precipitation_mm
+        data_tests:
+          - within_range:
+              arguments: {min_value: 0, max_value: 150}
+      - name: surface_pressure_hpa
+        data_tests:
+          - within_range:
+              arguments: {min_value: 850, max_value: 1090}
