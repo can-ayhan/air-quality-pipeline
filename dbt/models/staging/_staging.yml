@@ -33,7 +33,10 @@ models:
           - relationships:
               arguments: {to: "ref('stg_gios__stations')", field: station_id}
       - name: pollutant_code
-        data_tests: [not_null]
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('pollutant_limits')", field: pollutant_code}
 
   - name: stg_gios__measurements
     description: One row per sensor and hour, with the published CET timestamp and its UTC equivalent.

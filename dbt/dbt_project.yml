@@ -14,3 +14,7 @@ models:
     staging:
       +materialized: view
       +schema: staging
+
+seeds:
+  air_quality:
+    +schema: reference

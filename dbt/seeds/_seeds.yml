@@ -1,0 +1,30 @@
+version: 2
+
+seeds:
+  - name: pollutant_limits
+    description: >
+      The pollutants the pipeline tracks. plausible_min and plausible_max are not limits on air quality:
+      they bound what an analyser can report at all, far above any smog episode, so that a value outside
+      them means a unit or parsing error. who_guideline is the short-term value of the WHO global air
+      quality guidelines (2021): a 24-hour mean, or for ozone the highest 8-hour mean of the day.
+      Benzene has no short-term guideline.
+    config:
+      column_types:
+        pollutant_code: text
+        pollutant_name: text
+        unit: text
+        plausible_min: numeric
+        plausible_max: numeric
+        who_guideline: numeric
+        who_basis: text
+    columns:
+      - name: pollutant_code
+        data_tests: [not_null, unique]
+      - name: unit
+        data_tests:
+          - accepted_values:
+              arguments: {values: ["µg/m3", "mg/m3"]}
+      - name: who_basis
+        data_tests:
+          - accepted_values:
+              arguments: {values: [daily_mean, max_8h_mean]}
