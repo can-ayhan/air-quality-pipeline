@@ -38,3 +38,29 @@ models:
     data_tests:
       - unique_combination:
           arguments: {columns: [city, time_utc]}
+
+  - name: mart_station_daily
+    description: >
+      One row per station, pollutant and day: mean, maximum and highest 8-hour mean of the day,
+      whether the day has enough hours to count, whether it is above the WHO guideline, and the
+      weather of that day in the station's city.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [station_id, pollutant_code, measured_on]}
+    columns:
+      - name: station_id
+        data_tests: [not_null]
+      - name: measured_on
+        data_tests: [not_null]
+      - name: hours_measured
+        data_tests:
+          - within_range:
+              arguments: {min_value: 1, max_value: 24}
+      - name: daily_mean
+        data_tests: [not_null]
+      - name: is_complete_day
+        description: At least 18 of the 24 hours have a valid result.
+      - name: exceeds_who_guideline
+        description: >
+          NULL when the day is not complete or the pollutant has no short-term guideline.
+          Compares the daily mean, or for ozone the highest 8-hour mean, with the guideline.
