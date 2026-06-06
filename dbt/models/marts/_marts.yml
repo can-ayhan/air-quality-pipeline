@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: dim_station
+    description: One row per measuring station, with the pollutants it has sensors for.
+    columns:
+      - name: station_id
+        data_tests: [not_null, unique]
+
+  - name: fct_measurement_hourly
+    description: >
+      One row per sensor and hour with a valid result. Built incrementally from the rows
+      loaded since the last build.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [sensor_id, measured_at_utc]}
+    columns:
+      - name: sensor_id
+        data_tests: [not_null]
+      - name: station_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('dim_station')", field: station_id}
+      - name: pollutant_code
+        data_tests: [not_null]
+      - name: measured_at_utc
+        data_tests: [not_null]
+      - name: measured_on
+        description: The CET date of the result, the day it counts towards.
+        data_tests: [not_null]
+      - name: value
+        description: µg/m3, except CO in mg/m3.
+        data_tests: [not_null]
+
+  - name: fct_weather_hourly
+    description: One row per city and hour.
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [city, time_utc]}
