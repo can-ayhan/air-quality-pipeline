@@ -88,3 +88,21 @@ models:
         data_tests:
           - within_range:
               arguments: {min_value: 850, max_value: 1090}
+
+unit_tests:
+  - name: cet_is_one_hour_ahead_of_utc_all_year
+    description: >
+      GIOS timestamps do not follow daylight saving, so the shift is one hour in winter and in summer.
+      The day stays the CET day even when the UTC timestamp falls on the day before.
+    model: stg_gios__measurements
+    given:
+      - input: source('raw', 'gios_measurement')
+        rows:
+          - {sensor_id: 1, measured_at_cet: "2026-01-15 12:00:00"}
+          - {sensor_id: 1, measured_at_cet: "2026-03-29 03:00:00"}
+          - {sensor_id: 1, measured_at_cet: "2026-07-01 00:00:00"}
+    expect:
+      rows:
+        - {sensor_id: 1, measured_at_utc: "2026-01-15 11:00:00", measured_on: "2026-01-15"}
+        - {sensor_id: 1, measured_at_utc: "2026-03-29 02:00:00", measured_on: "2026-03-29"}
+        - {sensor_id: 1, measured_at_utc: "2026-06-30 23:00:00", measured_on: "2026-07-01"}

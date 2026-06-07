@@ -64,3 +64,69 @@ models:
         description: >
           NULL when the day is not complete or the pollutant has no short-term guideline.
           Compares the daily mean, or for ozone the highest 8-hour mean, with the guideline.
+
+unit_tests:
+  - name: daily_figures_and_who_flag
+    description: >
+      Three station-days: a full day above the PM10 guideline, a day with too few hours to judge,
+      and an ozone day whose daily mean is fine but whose afternoon is not.
+    model: mart_station_daily
+    given:
+      - input: ref('fct_measurement_hourly')
+        format: sql
+        rows: |
+          select 11 as sensor_id, 1 as station_id, 'PM10' as pollutant_code,
+                 timestamp '2026-01-10 00:00' + h * interval '1 hour' as measured_at_cet,
+                 date '2026-01-10' as measured_on, 50.0::double precision as value
+          from generate_series(0, 23) as h
+          union all
+          select 21, 2, 'PM10', timestamp '2026-01-10 00:00' + h * interval '1 hour', date '2026-01-10', 90.0
+          from generate_series(0, 16) as h
+          union all
+          select 12, 1, 'O3', timestamp '2026-01-10 00:00' + h * interval '1 hour', date '2026-01-10',
+                 case when h between 10 and 17 then 130.0 else 40.0 end
+          from generate_series(0, 23) as h
+      - input: ref('dim_station')
+        rows:
+          - {station_id: 1, station_name: First, city: Warszawa}
+          - {station_id: 2, station_name: Second, city: Warszawa}
+      - input: ref('fct_weather_hourly')
+        rows:
+          - {city: Warszawa, observed_on: "2026-01-10", temperature_c: -2.0, wind_speed_ms: 1.0, precipitation_mm: 0.5}
+          - {city: Warszawa, observed_on: "2026-01-10", temperature_c: -4.0, wind_speed_ms: 3.0, precipitation_mm: 0.0}
+      - input: ref('pollutant_limits')
+        rows:
+          - {pollutant_code: PM10, unit: µg/m3, who_guideline: 45, who_basis: daily_mean}
+          - {pollutant_code: O3, unit: µg/m3, who_guideline: 100, who_basis: max_8h_mean}
+    expect:
+      rows:
+        - station_id: 1
+          pollutant_code: PM10
+          measured_on: "2026-01-10"
+          hours_measured: 24
+          is_complete_day: true
+          daily_mean: "50.00"
+          exceeds_who_guideline: true
+          avg_temperature_c: -3.0
+          avg_wind_speed_ms: 2.0
+          total_precipitation_mm: 0.5
+        - station_id: 2
+          pollutant_code: PM10
+          measured_on: "2026-01-10"
+          hours_measured: 17
+          is_complete_day: false
+          daily_mean: "90.00"
+          exceeds_who_guideline: null
+          avg_temperature_c: -3.0
+          avg_wind_speed_ms: 2.0
+          total_precipitation_mm: 0.5
+        - station_id: 1
+          pollutant_code: O3
+          measured_on: "2026-01-10"
+          hours_measured: 24
+          is_complete_day: true
+          daily_mean: "70.00"
+          exceeds_who_guideline: true
+          avg_temperature_c: -3.0
+          avg_wind_speed_ms: 2.0
+          total_precipitation_mm: 0.5
