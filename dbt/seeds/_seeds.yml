@@ -5,9 +5,10 @@ seeds:
     description: >
       The pollutants the pipeline tracks. plausible_min and plausible_max are not limits on air quality:
       they bound what an analyser can report at all, far above any smog episode, so that a value outside
-      them means a unit or parsing error. who_guideline is the short-term value of the WHO global air
-      quality guidelines (2021): a 24-hour mean, or for ozone the highest 8-hour mean of the day.
-      Benzene has no short-term guideline.
+      them means a unit or parsing error. The lower bound is a little under zero because an analyser
+      measuring clean air reads around zero, sometimes just below it. who_guideline is the short-term
+      value of the WHO global air quality guidelines (2021): a 24-hour mean, or for ozone the highest
+      8-hour mean of the day. Benzene has no short-term guideline.
     config:
       column_types:
         pollutant_code: text

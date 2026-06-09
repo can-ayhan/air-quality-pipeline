@@ -1,8 +1,8 @@
 pollutant_code,pollutant_name,unit,plausible_min,plausible_max,who_guideline,who_basis
-PM10,Particulate matter under 10 µm,µg/m3,0,2000,45,daily_mean
-PM2.5,Particulate matter under 2.5 µm,µg/m3,0,1500,15,daily_mean
-NO2,Nitrogen dioxide,µg/m3,0,1000,25,daily_mean
-O3,Ozone,µg/m3,0,600,100,max_8h_mean
-SO2,Sulphur dioxide,µg/m3,0,2000,40,daily_mean
-CO,Carbon monoxide,mg/m3,0,50,4,daily_mean
-C6H6,Benzene,µg/m3,0,300,,
+PM10,Particulate matter under 10 µm,µg/m3,-5,2000,45,daily_mean
+PM2.5,Particulate matter under 2.5 µm,µg/m3,-5,1500,15,daily_mean
+NO2,Nitrogen dioxide,µg/m3,-5,1000,25,daily_mean
+O3,Ozone,µg/m3,-5,600,100,max_8h_mean
+SO2,Sulphur dioxide,µg/m3,-5,2000,40,daily_mean
+CO,Carbon monoxide,mg/m3,-0.5,50,4,daily_mean
+C6H6,Benzene,µg/m3,-1,300,,
