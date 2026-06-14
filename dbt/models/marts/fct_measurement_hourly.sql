@@ -26,6 +26,15 @@ sensors as (
 
     select * from {{ ref('stg_gios__sensors') }}
 
+),
+
+-- The unit comes from the reference data (CO is in mg/m3, the rest in µg/m3).
+-- Reading it here also puts this model downstream of everything the plausibility
+-- test reads, which is what makes dbt hold this model back when that test fails.
+pollutants as (
+
+    select pollutant_code, unit from {{ ref('pollutant_limits') }}
+
 )
 
 select
@@ -36,6 +45,8 @@ select
     measurements.measured_at_cet,
     measurements.measured_on,
     measurements.value,
+    pollutants.unit,
     measurements.loaded_at
 from measurements
 join sensors using (sensor_id)
+join pollutants using (pollutant_code)

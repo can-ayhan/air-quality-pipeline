@@ -30,6 +30,8 @@ models:
         description: The CET date of the result, the day it counts towards.
         data_tests: [not_null]
       - name: value
+        data_tests: [not_null]
+      - name: unit
         description: µg/m3, except CO in mg/m3.
         data_tests: [not_null]
 
