@@ -32,8 +32,24 @@ pip install -e ".[dbt]"
 dbt build --project-dir dbt --profiles-dir dbt
 ```
 
-So far the dbt project declares the raw tables as sources and builds one staging view on each.
+`dbt build` loads the reference data, builds the staging views and the marts, and runs the tests
+in between: a failed test on staging holds back the marts that read from it.
+
+| Layer | Schema | What |
+|---|---|---|
+| raw | `raw` | what the APIs returned, one table per endpoint |
+| staging | `staging` | one view per raw table: renamed columns, UTC next to the published CET time |
+| marts | `marts` | `dim_station`, `fct_measurement_hourly` (incremental), `fct_weather_hourly`, `mart_station_daily` |
+
+## Running it every day
+
+```
+docker compose up -d --build        # PostgreSQL and Airflow, UI on http://localhost:8080
+```
+
+The DAG `air_quality_daily` runs at 06:00 UTC, loads the previous day from both APIs and then
+runs `dbt build`. It is paused when first created; switch it on in the UI.
 
 ## Status
 
-Work in progress: steps 1 and 2 are done, 3 has started.
+Work in progress: steps 1 to 3 are done, 4 runs but has no retries or alerts yet.

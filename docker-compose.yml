@@ -10,11 +10,40 @@ services:
       - "${WAREHOUSE_PORT:-5435}:5432"
     volumes:
       - warehouse-data:/var/lib/postgresql/data
+      - ./docker/postgres/init-airflow-db.sql:/docker-entrypoint-initdb.d/10-airflow-db.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${WAREHOUSE_USER:-airquality} -d ${WAREHOUSE_DB:-warehouse}"]
       interval: 5s
       timeout: 3s
       retries: 10
 
+  # Scheduler, DAG processor, triggerer and API server in one container.
+  # Enough for one DAG on one machine; not how Airflow is run in production.
+  airflow:
+    build:
+      context: .
+      dockerfile: docker/airflow/Dockerfile
+    image: airquality-airflow
+    container_name: airquality-airflow
+    command: standalone
+    depends_on:
+      warehouse:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS: "true"      # local stack: the UI opens without a login
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@warehouse:5432/airflow
+      WAREHOUSE_HOST: warehouse
+      WAREHOUSE_PORT: "5432"
+      WAREHOUSE_DB: ${WAREHOUSE_DB:-warehouse}
+      WAREHOUSE_USER: ${WAREHOUSE_USER:-airquality}
+      WAREHOUSE_PASSWORD: ${WAREHOUSE_PASSWORD:-airquality}
+    ports:
+      - "${AIRFLOW_PORT:-8080}:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - airflow-logs:/opt/airflow/logs
+
 volumes:
   warehouse-data:
+  airflow-logs:
