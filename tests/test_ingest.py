@@ -63,6 +63,14 @@ def test_daily_manual_samples_are_left_out(conn, monkeypatch):
     ]
 
 
+def test_an_empty_answer_for_every_sensor_is_an_error(conn):
+    another_day = dt.date(2026, 4, 25)          # the saved responses only have 20 April
+    with pytest.raises(ingest.NoDataError, match="no hourly results from 5 sensors"):
+        ingest.ingest_air_quality(conn, GiosClient(session=FixtureSession()), WARSAW,
+                                  another_day, another_day)
+    assert count(conn, "gios_station") == 10    # the station list is still worth keeping
+
+
 def test_weather_is_asked_from_the_day_before(conn):
     session = FixtureSession()
     ingest.ingest_weather(conn, WARSAW, DAY, DAY, session=session, today=dt.date(2026, 4, 21))

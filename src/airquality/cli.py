@@ -27,11 +27,15 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     coverage = load_coverage()
     with warehouse.connect() as conn:
         warehouse.ensure_raw_schema(conn)
-        if args.source in ("air", "all"):
-            print(ingest.ingest_air_quality(conn, GiosClient(), coverage, first_day, last_day,
-                                            workers=args.workers))
-        if args.source in ("weather", "all"):
-            print({"weather_hours": ingest.ingest_weather(conn, coverage, first_day, last_day)})
+        try:
+            if args.source in ("air", "all"):
+                print(ingest.ingest_air_quality(conn, GiosClient(), coverage, first_day, last_day,
+                                                workers=args.workers))
+            if args.source in ("weather", "all"):
+                print({"weather_hours": ingest.ingest_weather(conn, coverage, first_day, last_day)})
+        except ingest.NoDataError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return 1
     return 0
 
 

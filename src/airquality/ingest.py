@@ -22,6 +22,10 @@ log = logging.getLogger(__name__)
 FETCH_WORKERS = 4
 
 
+class NoDataError(RuntimeError):
+    """The APIs answered, with nothing for the requested days."""
+
+
 def ingest_air_quality(conn: psycopg.Connection, client: GiosClient, coverage: Coverage,
                        first_day: dt.date, last_day: dt.date, workers: int = FETCH_WORKERS) -> dict[str, int]:
     """Stations and sensors of the covered cities, then their hourly results for the days."""
@@ -51,6 +55,10 @@ def ingest_air_quality(conn: psycopg.Connection, client: GiosClient, coverage: C
                 log.info("GIOS: %s of %s sensors, %s results so far",
                          done, len(sensors), counts["measurements"])
     log.info("GIOS %s to %s: %s", first_day, last_day, counts)
+    if counts["measurements"] == 0:
+        # every request succeeded and none had a result: the day is not published yet,
+        # or the API is answering with empty lists. Either way the load did not happen.
+        raise NoDataError(f"no hourly results from {len(sensors)} sensors for {first_day} to {last_day}")
     return counts
 
 
