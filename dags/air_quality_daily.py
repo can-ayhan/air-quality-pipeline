@@ -6,11 +6,16 @@
 
 A run belongs to one day: the day its data interval starts on. The run that
 starts at 06:00 UTC on the 2nd loads the 1st.
+
+The ingests call free public APIs that are sometimes slow or briefly down, so
+they are retried with a growing pause. The dbt build is not: a failed test
+fails again on the same data, and should be looked at instead.
 """
 
 from __future__ import annotations
 
 import os
+from datetime import timedelta
 
 import pendulum
 from airflow.providers.standard.operators.bash import BashOperator
@@ -20,10 +25,19 @@ from airflow.timetables.interval import CronDataIntervalTimetable
 PIPELINE_HOME = os.environ.get("PIPELINE_HOME", "/opt/pipeline")
 PIPELINE_VENV = os.environ.get("PIPELINE_VENV", "/opt/pipeline-venv")
 INGEST = f"{PIPELINE_VENV}/bin/python -m airquality ingest"
-DBT = f"{PIPELINE_VENV}/bin/dbt"
+DBT = f"{PIPELINE_VENV}/bin/dbt --no-use-colors"
 DBT_DIRS = f"--project-dir {PIPELINE_HOME}/dbt --profiles-dir {PIPELINE_HOME}/dbt"
 
 DAY = "{{ data_interval_start | ds }}"
+
+default_args = {
+    "retries": 3,
+    "retry_delay": timedelta(minutes=2),
+    "retry_exponential_backoff": 2.0,             # the pause doubles each time, plus jitter
+    "max_retry_delay": timedelta(minutes=30),
+    "execution_timeout": timedelta(minutes=45),   # a cold archive endpoint needs minutes, not hours
+    "do_xcom_push": False,
+}
 
 with DAG(
     dag_id="air_quality_daily",
@@ -32,6 +46,7 @@ with DAG(
     start_date=pendulum.datetime(2026, 1, 1, tz="UTC"),
     catchup=False,
     max_active_runs=1,
+    default_args=default_args,
     tags=["air-quality"],
     doc_md=__doc__,
 ) as dag:
@@ -48,6 +63,8 @@ with DAG(
     dbt_build = BashOperator(
         task_id="dbt_build",
         bash_command=f"{DBT} build {DBT_DIRS}",
+        retries=0,
+        execution_timeout=timedelta(minutes=20),
     )
 
     [ingest_air_quality, ingest_weather] >> dbt_build
