@@ -48,15 +48,25 @@ def upsert_sensors(conn: psycopg.Connection, sensors: list[Sensor]) -> int:
 
 
 def upsert_measurements(conn: psycopg.Connection, measurements: list[Measurement]) -> int:
+    """Insert new results and update changed ones. Returns how many rows that was.
+
+    A result that is already stored with the same value is left alone, loaded_at
+    included, so loaded_at says when a row last changed. The incremental model
+    downstream relies on that to pick up only what is new.
+    """
+    if not measurements:
+        return 0
     with conn.cursor() as cur:
         cur.executemany(
-            """insert into raw.gios_measurement (sensor_id, sensor_code, measured_at_cet, value)
+            """insert into raw.gios_measurement as stored (sensor_id, sensor_code, measured_at_cet, value)
                values (%s, %s, %s, %s)
                on conflict (sensor_id, measured_at_cet) do update set
-                   sensor_code = excluded.sensor_code, value = excluded.value, loaded_at = now()""",
+                   sensor_code = excluded.sensor_code, value = excluded.value, loaded_at = now()
+               where stored.value is distinct from excluded.value
+                  or stored.sensor_code is distinct from excluded.sensor_code""",
             [(m.sensor_id, m.sensor_code, m.measured_at_cet, m.value) for m in measurements],
         )
-    return len(measurements)
+        return cur.rowcount
 
 
 def upsert_weather(conn: psycopg.Connection, city: str, hours: list[WeatherHour]) -> int:

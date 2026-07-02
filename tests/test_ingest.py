@@ -22,7 +22,7 @@ def count(conn, table: str) -> int:
 
 def test_only_covered_cities_and_pollutants_are_loaded(conn):
     counts = ingest.ingest_air_quality(conn, GiosClient(session=FixtureSession()), WARSAW, DAY, DAY)
-    assert counts == {"stations": 10, "sensors": 5, "measurements": 48}
+    assert counts == {"stations": 10, "sensors": 5, "measurements": 48, "changed": 48}
     cities = conn.execute("select distinct city from raw.gios_station").fetchall()
     assert cities == [("Warszawa",)]
     codes = {row[0] for row in conn.execute("select pollutant_code from raw.gios_sensor")}
@@ -31,20 +31,27 @@ def test_only_covered_cities_and_pollutants_are_loaded(conn):
 
 def test_loading_the_same_day_twice_changes_nothing(conn):
     client = GiosClient(session=FixtureSession())
+    state = "select sum(value), count(*), max(loaded_at) from raw.gios_measurement"
     ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
-    before = conn.execute("select sum(value), count(*) from raw.gios_measurement").fetchone()
-    ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
-    after = conn.execute("select sum(value), count(*) from raw.gios_measurement").fetchone()
-    assert before == after == (pytest.approx(847.3), 48)
+    before = conn.execute(state).fetchone()
+    counts = ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
+    assert (counts["measurements"], counts["changed"]) == (48, 0)
+    assert conn.execute(state).fetchone() == before
+    assert before[:2] == (pytest.approx(847.3), 48)
 
 
 def test_a_corrected_value_replaces_the_old_one(conn):
     client = GiosClient(session=FixtureSession())
     ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
-    conn.execute("update raw.gios_measurement set value = -1 where sensor_id = 3584")
-    ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
-    lowest = conn.execute("select min(value) from raw.gios_measurement where sensor_id = 3584").fetchone()[0]
-    assert lowest > 0
+    conn.execute("""update raw.gios_measurement set value = -1, loaded_at = '2026-04-21 06:00+00'
+                    where sensor_id = 3584 and measured_at_cet = '2026-04-20 05:00'""")
+    counts = ingest.ingest_air_quality(conn, client, WARSAW, DAY, DAY)
+    assert counts["changed"] == 1
+    value, reloaded = conn.execute(
+        """select value, loaded_at > '2026-04-21 06:00+00' from raw.gios_measurement
+           where sensor_id = 3584 and measured_at_cet = '2026-04-20 05:00'"""
+    ).fetchone()
+    assert value > 0 and reloaded
 
 
 def test_daily_manual_samples_are_left_out(conn, monkeypatch):
@@ -57,7 +64,7 @@ def test_daily_manual_samples_are_left_out(conn, monkeypatch):
 
     monkeypatch.setattr(GiosClient, "measurements", with_a_daily_sample)
     counts = ingest.ingest_air_quality(conn, GiosClient(session=FixtureSession()), WARSAW, DAY, DAY)
-    assert counts["measurements"] == 5
+    assert (counts["measurements"], counts["changed"]) == (5, 5)
     assert conn.execute("select distinct sensor_code from raw.gios_measurement").fetchall() == [
         ("MzWarAlNiepo-PM10-1g",)
     ]
