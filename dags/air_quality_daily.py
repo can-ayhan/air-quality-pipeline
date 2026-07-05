@@ -10,6 +10,8 @@ starts at 06:00 UTC on the 2nd loads the 1st.
 The ingests call free public APIs that are sometimes slow or briefly down, so
 they are retried with a growing pause. The dbt build is not: a failed test
 fails again on the same data, and should be looked at instead.
+
+A task that fails for good sends one message to the webhook in ALERT_WEBHOOK_URL.
 """
 
 from __future__ import annotations
@@ -21,6 +23,8 @@ import pendulum
 from airflow.providers.standard.operators.bash import BashOperator
 from airflow.sdk import DAG
 from airflow.timetables.interval import CronDataIntervalTimetable
+
+from alerts import notify_failure
 
 PIPELINE_HOME = os.environ.get("PIPELINE_HOME", "/opt/pipeline")
 PIPELINE_VENV = os.environ.get("PIPELINE_VENV", "/opt/pipeline-venv")
@@ -37,6 +41,7 @@ default_args = {
     "max_retry_delay": timedelta(minutes=30),
     "execution_timeout": timedelta(minutes=45),   # a cold archive endpoint needs minutes, not hours
     "do_xcom_push": False,
+    "on_failure_callback": notify_failure,
 }
 
 with DAG(
