@@ -5,7 +5,9 @@
     ingest_weather ──────┘
 
 A run belongs to one day: the day its data interval starts on. The run that
-starts at 06:00 UTC on the 2nd loads the 1st.
+starts at 06:00 UTC on the 2nd loads the 1st. A backfill creates one run per
+day of its range. A run triggered by hand loads the day of the last scheduled
+run, or the day given as target_date.
 
 The ingests call free public APIs that are sometimes slow or briefly down, so
 they are retried with a growing pause. The dbt build is not: a failed test
@@ -21,10 +23,11 @@ from datetime import timedelta
 
 import pendulum
 from airflow.providers.standard.operators.bash import BashOperator
-from airflow.sdk import DAG
+from airflow.sdk import DAG, Param
 from airflow.timetables.interval import CronDataIntervalTimetable
 
 from alerts import notify_failure
+from run_day import target_day
 
 PIPELINE_HOME = os.environ.get("PIPELINE_HOME", "/opt/pipeline")
 PIPELINE_VENV = os.environ.get("PIPELINE_VENV", "/opt/pipeline-venv")
@@ -32,7 +35,7 @@ INGEST = f"{PIPELINE_VENV}/bin/python -m airquality ingest"
 DBT = f"{PIPELINE_VENV}/bin/dbt --no-use-colors"
 DBT_DIRS = f"--project-dir {PIPELINE_HOME}/dbt --profiles-dir {PIPELINE_HOME}/dbt"
 
-DAY = "{{ data_interval_start | ds }}"
+DAY = "{{ target_day(dag_run, params) }}"
 
 default_args = {
     "retries": 3,
@@ -42,6 +45,9 @@ default_args = {
     "execution_timeout": timedelta(minutes=45),   # a cold archive endpoint needs minutes, not hours
     "do_xcom_push": False,
     "on_failure_callback": notify_failure,
+    # one instance of a task at a time across runs: a backfill must not multiply the
+    # requests to the APIs or run two dbt builds on the same tables
+    "max_active_tis_per_dag": 1,
 }
 
 with DAG(
@@ -52,6 +58,16 @@ with DAG(
     catchup=False,
     max_active_runs=1,
     default_args=default_args,
+    params={
+        "target_date": Param(
+            None,
+            type=["null", "string"],
+            format="date",
+            title="Day to load",
+            description="YYYY-MM-DD. Leave empty to load the day of the last scheduled run.",
+        ),
+    },
+    user_defined_macros={"target_day": target_day},
     tags=["air-quality"],
     doc_md=__doc__,
 ) as dag:

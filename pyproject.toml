@@ -31,4 +31,4 @@ line-length = 110
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["airquality", "fixture_api", "alerts"]
+known-first-party = ["airquality", "fixture_api", "alerts", "run_day"]

@@ -50,6 +50,36 @@ docker compose up -d --build        # PostgreSQL and Airflow, UI on http://local
 The DAG `air_quality_daily` runs at 06:00 UTC, loads the previous day from both APIs and then
 runs `dbt build`. It is paused when first created; switch it on in the UI.
 
+The ingest tasks are retried three times with a growing pause. A task that fails for good posts
+a message to the webhook in `ALERT_WEBHOOK_URL` (see `.env.example`).
+
+### Other days
+
+One day, from the UI ("Trigger" and fill in *Day to load*) or the command line:
+
+```
+docker compose exec airflow airflow dags trigger air_quality_daily -c '{"target_date": "2026-07-08"}'
+```
+
+A range of days, one run per day, oldest first:
+
+```
+docker compose exec airflow airflow backfill create --dag-id air_quality_daily     --from-date 2026-07-13 --to-date 2026-07-15T06:00
+```
+
+The run for a day has the logical date 06:00 UTC of that day, so an end given as a bare date
+stops one day short: `--to-date 2026-07-15` creates the runs for the 13th and the 14th.
+
+Loading a day again is safe, by either route: rows are matched on their key.
+
+For the first load of a long history the command line is quicker than one run per day,
+because a single request to GIOS can cover up to a year:
+
+```
+python -m airquality ingest --from 2026-01-01 --to 2026-06-30
+dbt build --project-dir dbt --profiles-dir dbt
+```
+
 ## Status
 
-Work in progress: steps 1 to 3 are done, 4 runs but has no retries or alerts yet.
+Work in progress: steps 1 to 4 are done, CI is next.
