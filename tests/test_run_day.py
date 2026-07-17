@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from run_day import target_day
+from run_day import days_before, target_day
 
 
 def run(interval_start=None, run_after=None):
@@ -29,3 +29,7 @@ def test_a_date_that_is_not_a_date_is_refused():
     with pytest.raises(ValueError):
         target_day(run(), {"target_date": "yesterday"})
 
+
+def test_days_before_crosses_months():
+    assert days_before("2026-07-01", 2) == "2026-06-29"
+    assert days_before("2026-03-01", 1) == "2026-02-28"

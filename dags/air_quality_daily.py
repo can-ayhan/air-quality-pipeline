@@ -9,6 +9,10 @@ starts at 06:00 UTC on the 2nd loads the 1st. A backfill creates one run per
 day of its range. A run triggered by hand loads the day of the last scheduled
 run, or the day given as target_date.
 
+Each run also asks again for the two days before its own. Results that were
+missing in the morning are sometimes published later, a request covers a range
+of days at no extra cost, and rows that have not changed are left alone.
+
 The ingests call free public APIs that are sometimes slow or briefly down, so
 they are retried with a growing pause. The dbt build is not: a failed test
 fails again on the same data, and should be looked at instead.
@@ -27,7 +31,7 @@ from airflow.sdk import DAG, Param
 from airflow.timetables.interval import CronDataIntervalTimetable
 
 from alerts import notify_failure
-from run_day import target_day
+from run_day import days_before, target_day
 
 PIPELINE_HOME = os.environ.get("PIPELINE_HOME", "/opt/pipeline")
 PIPELINE_VENV = os.environ.get("PIPELINE_VENV", "/opt/pipeline-venv")
@@ -35,7 +39,9 @@ INGEST = f"{PIPELINE_VENV}/bin/python -m airquality ingest"
 DBT = f"{PIPELINE_VENV}/bin/dbt --no-use-colors"
 DBT_DIRS = f"--project-dir {PIPELINE_HOME}/dbt --profiles-dir {PIPELINE_HOME}/dbt"
 
+RELOAD_DAYS = 2
 DAY = "{{ target_day(dag_run, params) }}"
+FIRST_DAY = f"{{{{ days_before(target_day(dag_run, params), {RELOAD_DAYS}) }}}}"
 
 default_args = {
     "retries": 3,
@@ -67,18 +73,18 @@ with DAG(
             description="YYYY-MM-DD. Leave empty to load the day of the last scheduled run.",
         ),
     },
-    user_defined_macros={"target_day": target_day},
+    user_defined_macros={"target_day": target_day, "days_before": days_before},
     tags=["air-quality"],
     doc_md=__doc__,
 ) as dag:
     ingest_air_quality = BashOperator(
         task_id="ingest_air_quality",
-        bash_command=f"{INGEST} --source air --from {DAY} --to {DAY}",
+        bash_command=f"{INGEST} --source air --from {FIRST_DAY} --to {DAY}",
     )
 
     ingest_weather = BashOperator(
         task_id="ingest_weather",
-        bash_command=f"{INGEST} --source weather --from {DAY} --to {DAY}",
+        bash_command=f"{INGEST} --source weather --from {FIRST_DAY} --to {DAY}",
     )
 
     dbt_build = BashOperator(

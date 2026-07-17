@@ -22,3 +22,6 @@ def target_day(dag_run, params) -> str:
         return start.strftime("%Y-%m-%d")
     return (dag_run.run_after - timedelta(days=1)).strftime("%Y-%m-%d")
 
+
+def days_before(day: str, days: int) -> str:
+    return (date.fromisoformat(day) - timedelta(days=days)).isoformat()

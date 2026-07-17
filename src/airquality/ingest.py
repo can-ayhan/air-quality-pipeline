@@ -47,20 +47,25 @@ def ingest_air_quality(conn: psycopg.Connection, client: GiosClient, coverage: C
         conn.commit()
         # the requests run in the pool; the rows are written here, in order, on the one connection
         fetch = partial(client.measurements, first_day=first_day, last_day=last_day)
+        newest: dt.datetime | None = None
         for done, results in enumerate(pool.map(fetch, [s.sensor_id for s in sensors]), start=1):
             # PM and benzene are also sampled by hand on filters: one value a day, code ending in -24g
             hourly = [m for m in results if m.is_hourly]
             counts["measurements"] += len(hourly)
             counts["changed"] += warehouse.upsert_measurements(conn, hourly)
+            if hourly:
+                latest = max(m.measured_at_cet for m in hourly)
+                newest = latest if newest is None else max(newest, latest)
             conn.commit()          # per sensor: an interrupted load keeps what it already has
             if done % 25 == 0:
                 log.info("GIOS: %s of %s sensors, %s results so far",
                          done, len(sensors), counts["measurements"])
     log.info("GIOS %s to %s: %s", first_day, last_day, counts)
-    if counts["measurements"] == 0:
-        # every request succeeded and none had a result: the day is not published yet,
-        # or the API is answering with empty lists. Either way the load did not happen.
-        raise NoDataError(f"no hourly results from {len(sensors)} sensors for {first_day} to {last_day}")
+    if newest is None or newest.date() < last_day:
+        # every request succeeded and none had a result for the last day: it is not published
+        # yet, or the API is answering with empty lists. Either way the load did not happen.
+        raise NoDataError(f"no hourly results from {len(sensors)} sensors for {last_day}"
+                          f" (newest result: {newest or 'none'})")
     return counts
 
 
