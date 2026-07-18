@@ -64,7 +64,8 @@ docker compose exec airflow airflow dags trigger air_quality_daily -c '{"target_
 A range of days, one run per day, oldest first:
 
 ```
-docker compose exec airflow airflow backfill create --dag-id air_quality_daily     --from-date 2026-07-13 --to-date 2026-07-15T06:00
+docker compose exec airflow airflow backfill create --dag-id air_quality_daily \
+    --from-date 2026-07-13 --to-date 2026-07-15T06:00
 ```
 
 The run for a day has the logical date 06:00 UTC of that day, so an end given as a bare date
