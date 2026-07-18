@@ -37,3 +37,39 @@ jobs:
         run: ruff check .
       - name: Tests
         run: pytest -q -rs
+
+  dbt:
+    name: dbt build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: airquality
+          POSTGRES_PASSWORD: airquality
+          POSTGRES_DB: warehouse
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U airquality -d warehouse"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      WAREHOUSE_HOST: localhost
+      WAREHOUSE_PORT: "5432"
+      DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev,dbt]"
+      - name: Load the saved API responses into the raw schema
+        run: python tests/load_sample.py
+      - name: Build the models and run their tests
+        run: dbt build --project-dir dbt --profiles-dir dbt
+      - name: A bad load must be stopped, a reload must replace its rows
+        run: pytest -q tests/test_pipeline.py
