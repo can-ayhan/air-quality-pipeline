@@ -81,6 +81,11 @@ python -m airquality ingest --from 2026-01-01 --to 2026-06-30
 dbt build --project-dir dbt --profiles-dir dbt
 ```
 
-## Status
+## CI
 
-Work in progress: steps 1 to 4 are done, CI is next.
+Every push runs three jobs in GitHub Actions (`.github/workflows/ci.yml`):
+
+- **Lint and tests**: ruff, then the Python tests against a PostgreSQL service
+- **dbt build**: the saved API responses loaded through the ingest code, every model built and every
+  dbt test run, then a check that an out-of-range result stops the marts
+- **Airflow DAG**: the DAG imported in Airflow 3.2.1, its wiring, retries and rendered commands

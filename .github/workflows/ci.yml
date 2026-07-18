@@ -73,3 +73,20 @@ jobs:
         run: dbt build --project-dir dbt --profiles-dir dbt
       - name: A bad load must be stopped, a reload must replace its rows
         run: pytest -q tests/test_pipeline.py
+
+  dag:
+    name: Airflow DAG
+    runs-on: ubuntu-latest
+    env:
+      AIRFLOW_VERSION: "3.2.1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Airflow
+        run: >-
+          pip install "apache-airflow==${AIRFLOW_VERSION}" pytest
+          --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-3.12.txt"
+      - name: The DAG loads and is wired as intended
+        run: pytest -q tests/test_dag.py tests/test_alerts.py tests/test_run_day.py
