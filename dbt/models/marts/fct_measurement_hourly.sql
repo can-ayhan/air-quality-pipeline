@@ -2,7 +2,11 @@
     config(
         materialized='incremental',
         unique_key=['sensor_id', 'measured_at_utc'],
-        on_schema_change='fail'
+        on_schema_change='fail',
+        indexes=[
+            {'columns': ['sensor_id', 'measured_at_utc'], 'unique': True},
+            {'columns': ['station_id', 'pollutant_code', 'measured_on']}
+        ]
     )
 }}
 
