@@ -18,7 +18,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import requests
 
@@ -101,6 +101,27 @@ def parse_measurement(sensor_id: int, item: dict) -> Measurement:
     )
 
 
+def untangle_clock_change(results: list[Measurement]) -> list[Measurement]:
+    """Give the hour of the spring clock change its own timestamp back.
+
+    The results are in CET, which has no clock change. Even so, for the last
+    Sunday of March the archive has no result at 02:00 and two at 03:00 (every
+    sensor on 2026-03-29). The list is in time order, so the first of the two is
+    the 02:00 result. Left alone, the two overwrite each other on the key: the
+    day has 23 hours and every reload flips the value at 03:00.
+    """
+    fixed: list[Measurement] = []
+    for result in results:
+        previous = fixed[-1] if fixed else None
+        same_stamp = previous is not None and previous.measured_at_cet == result.measured_at_cet
+        if same_stamp and previous.sensor_code == result.sensor_code:
+            hour_before = result.measured_at_cet - dt.timedelta(hours=1)
+            if len(fixed) < 2 or fixed[-2].measured_at_cet < hour_before:
+                fixed[-1] = replace(previous, measured_at_cet=hour_before)
+        fixed.append(result)
+    return fixed
+
+
 class GiosClient:
     def __init__(self, session: requests.Session | None = None, base_url: str = BASE_URL,
                  pause: float = 0.15, max_retries: int = 4, timeout: float = 40):
@@ -151,4 +172,4 @@ class GiosClient:
         """All results of a sensor from 00:00 on first_day to 23:00 on last_day (CET)."""
         params = {"dateFrom": f"{first_day:%Y-%m-%d} 00:00", "dateTo": f"{last_day:%Y-%m-%d} 23:00"}
         items = self._all_pages(f"archivalData/getDataBySensor/{sensor_id}", MEASUREMENTS, params)
-        return [parse_measurement(sensor_id, item) for item in items]
+        return untangle_clock_change([parse_measurement(sensor_id, item) for item in items])

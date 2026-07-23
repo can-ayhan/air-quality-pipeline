@@ -55,6 +55,30 @@ def test_daily_manual_results_are_not_hourly():
     assert not gios.parse_measurement(1, item).is_hourly
 
 
+def clock_change_rows() -> list[dict]:
+    # sensor 3584 on 29 March 2026, as the archive returns it: no 02:00, two results at 03:00
+    values = [("00:00", 45.4), ("01:00", 43.3), ("03:00", 40.8), ("03:00", 40.7),
+              ("04:00", 37.0), ("05:00", 38.1)]
+    return [{"Kod stanowiska": "MzWarAlNiepo-PM10-1g", "Data": f"2026-03-29 {hour}:00", "Wartość": value}
+            for hour, value in values]
+
+
+def test_the_doubled_hour_of_the_clock_change_gets_its_own_timestamp():
+    session = ScriptedSession([FakeResponse({gios.MEASUREMENTS: clock_change_rows(), "totalPages": 1})])
+    results = GiosClient(session=session).measurements(3584, dt.date(2026, 3, 29), dt.date(2026, 3, 29))
+    assert [(r.measured_at_cet.hour, r.value) for r in results] == [
+        (0, 45.4), (1, 43.3), (2, 40.8), (3, 40.7), (4, 37.0), (5, 38.1),
+    ]
+
+
+def test_a_repeated_timestamp_stays_put_when_the_hour_before_is_taken():
+    rows = clock_change_rows()
+    rows.insert(2, {"Kod stanowiska": "MzWarAlNiepo-PM10-1g", "Data": "2026-03-29 02:00:00", "Wartość": 41.0})
+    session = ScriptedSession([FakeResponse({gios.MEASUREMENTS: rows, "totalPages": 1})])
+    results = GiosClient(session=session).measurements(3584, dt.date(2026, 3, 29), dt.date(2026, 3, 29))
+    assert [r.measured_at_cet.hour for r in results] == [0, 1, 2, 3, 3, 4, 5]
+
+
 def test_all_pages_are_read():
     rows = load("gios_measurements_3584_2026-04-20.json")[gios.MEASUREMENTS]
     session = ScriptedSession([
