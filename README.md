@@ -170,6 +170,43 @@ Every push runs three jobs in GitHub Actions (`.github/workflows/ci.yml`):
 - **Airflow DAG**: the DAG imported in Airflow 3.2.1, its wiring, retries, alert callback and the
   commands it renders for a scheduled run and for a chosen day
 
+## What six months of data show
+
+1 January to 30 June 2026: 504,545 hourly results from 119 sensors at 34 stations, 21,243
+station-days. The queries are in `analysis/station_queries.sql`.
+
+Share of station-days above the WHO short-term guideline (days with at least 18 measured hours):
+
+| Pollutant | Station-days | Above the guideline |
+|---|---:|---:|
+| PM2.5 | 4,087 | 48.4 % |
+| NO2 | 4,439 | 44.5 % |
+| PM10 | 5,160 | 15.4 % |
+| O3 | 2,306 | 13.1 % |
+| SO2, CO | 3,829 | 0 % |
+
+PM2.5 is a heating-season problem:
+
+| Month | Mean PM2.5 (µg/m³) | Station-days above 15 µg/m³ | Mean temperature |
+|---|---:|---:|---:|
+| January | 35.6 | 82 % | -4.5 °C |
+| February | 25.9 | 79 % | -2.0 °C |
+| March | 23.7 | 80 % | 6.9 °C |
+| April | 12.7 | 29 % | 8.4 °C |
+| May | 10.2 | 10 % | 14.9 °C |
+| June | 9.7 | 10 % | 19.7 °C |
+
+And wind is what clears it. PM10 from January to March by the day's mean wind speed:
+
+| Wind | Station-days | Mean PM10 (µg/m³) | Above 45 µg/m³ |
+|---|---:|---:|---:|
+| under 2 m/s | 587 | 53.5 | 53.3 % |
+| 2 to 4 m/s | 1,518 | 37.4 | 27.7 % |
+| 4 m/s and more | 469 | 23.5 | 7.2 % |
+
+The worst day in the data is 20 January in Kraków: a daily mean of 212 µg/m³ of PM10 at
+ul. Bujaka, at -10 °C and 0.8 m/s of wind.
+
 ## Found along the way
 
 - The old GIOŚ paths (`/pjp-api/rest`) answer `410 Gone`. The current API is `/pjp-api/v1/rest`.
@@ -199,6 +236,7 @@ sql/raw_schema.sql         the raw tables
 dbt/                       sources, staging, marts, seed, generic and singular tests, unit tests
 dags/                      the DAG, the alert callback, the rule for which day a run loads
 docker/                    Airflow image, database init
+analysis/                  queries on the marts
 tests/                     Python tests, saved API responses, dbt and DAG tests
 .github/workflows/ci.yml   CI
 ```
